@@ -3,7 +3,6 @@
  */
 package com.floern.genericbot.frame.chat;
 
-import com.floern.genericbot.frame.chat.commands.*;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.ProgramProperties;
 
@@ -36,41 +35,29 @@ public class ChatManager {
 	private Map<Integer, Room> chatrooms;
 
 	private List<Command> availableCommands = new LinkedList<>();
-	private StatusCommand statusCommand;
 
 	private CountDownLatch terminationCountdown;
 
 	private volatile boolean isRestarting;
-	private volatile int restartRoomId;
 
 
 	public ChatManager(ProgramProperties programProperties) {
-		this(programProperties, -1);
-	}
-
-
-	public ChatManager(ProgramProperties programProperties, int restartRoomId) {
 		this.programProperties = programProperties;
-		this.restartRoomId = restartRoomId;
 
 		this.botOwners = Arrays.stream(programProperties.getIntArray("chat.roomids"))
 				.asLongStream().boxed().collect(Collectors.toList());
-
-		availableCommands.clear();
-
-		// generic commands
-		availableCommands.add(new AliveCommand());
-		statusCommand = new StatusCommand();
-		availableCommands.add(statusCommand);
-		availableCommands.add(new RestartCommand());
-		availableCommands.add(new TerminateCommand());
-		availableCommands.add(new CommandsCommand(availableCommands));
-
-		availableCommands.add(new BotsAliveCommand());
-		availableCommands.add(new TheTrainCommand());
 	}
 
 
+	/**
+	 * Start the chat manager, login to chat and wait for termination.
+	 * Blocks until it's terminated.
+	 * @param usermail
+	 * @param userpass
+	 * @param devroomid
+	 * @param roomids
+	 * @param chatConnectedCallback
+	 */
 	public void start(String usermail, String userpass, int devroomid, int[] roomids, Runnable chatConnectedCallback) {
 		terminationCountdown = new CountDownLatch(1);
 
@@ -100,15 +87,7 @@ public class ChatManager {
 			LOGGER.info("connected");
 		}
 
-		if (restartRoomId > 0) {
-			devChatroom.send("\u2026dary");
-			if (restartRoomId != devroomid && chatrooms.containsKey(restartRoomId)) {
-				chatrooms.get(restartRoomId).send("\u2026dary");
-			}
-		}
-		else {
-			devChatroom.send("up and online!");
-		}
+		devChatroom.send("up and online!");
 
 		chatConnectedCallback.run();
 
@@ -135,7 +114,7 @@ public class ChatManager {
 	 * @return
 	 */
 	public Room getChatRoom(int roomId) {
-		return chatrooms.containsKey(roomId) ? chatrooms.get(roomId) : devChatroom;
+		return chatrooms.getOrDefault(roomId, devChatroom);
 	}
 
 
@@ -170,23 +149,23 @@ public class ChatManager {
 
 
 	/**
-	 * Add a new status record callback.
-	 * @param statusRecordCallback
+	 * Get all registered commands.
+	 * @return
 	 */
-	public void registerStatusRecordCallback(StatusCommand.StatusRecordCallback statusRecordCallback) {
-		statusCommand.registerStatusRecordCallback(statusRecordCallback);
+	public List<Command> getAllCommands() {
+		return availableCommands;
 	}
 
 
 	/**
 	 * Get the matching command for the input command string.
-	 * @param command
+	 * @param command input string
 	 * @param invocationType
 	 * @return command, or null if none found.
 	 */
-	public Command getCommand(String command, int invocationType) {
+	public Command getCommand(String command, MessageEvent invocationType) {
 		for (Command cmd : availableCommands) {
-			if ((cmd.getInvocationType() & invocationType) != 0 && cmd.is(command)) {
+			if (cmd.getInvocationType().equals(EventType.fromEvent(invocationType)) && cmd.is(command)) {
 				return cmd;
 			}
 		}
@@ -197,7 +176,7 @@ public class ChatManager {
 	/**
 	 * Execute a command.
 	 * @param command Command instance.
-	 * @param message Chat message event, null if it's not from chat.
+	 * @param message Chat message event that triggered this command, null if it's not from chat.
 	 * @param messageContent plain command message string.
 	 * @return Command result.
 	 */
@@ -214,30 +193,15 @@ public class ChatManager {
 
 	/**
 	 * Trigger a restart, i.e. log off the chat and shutdown (and wait for someone to start a new instance again).
-	 * @param roomID the ID of the room from that the restart was requested.
-	 */
-	public void restart(int roomID) {
-		isRestarting = true;
-		restartRoomId = roomID;
-		terminationCountdown.countDown();
-	}
-
-
-	/**
-	 * Trigger a restart, i.e. log off the chat and shutdown (and wait for someone to start a new instance again).
 	 */
 	public void restart() {
-		restart(-1);
+		isRestarting = true;
+		terminationCountdown.countDown();
 	}
 
 
 	public boolean isRestarting() {
 		return isRestarting;
-	}
-
-
-	public int getRestartRoomId() {
-		return restartRoomId;
 	}
 
 
@@ -250,7 +214,6 @@ public class ChatManager {
 	 * Trigger termination.
 	 */
 	public void terminate() {
-		restartRoomId = -1;
 		terminationCountdown.countDown();
 	}
 

@@ -9,6 +9,8 @@ import com.floern.genericbot.frame.utils.Emojis;
 
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
+import fr.tunaki.stackoverflow.chat.event.EventType;
+import fr.tunaki.stackoverflow.chat.event.MessageEvent;
 
 public class TheTrainCommand extends Command {
 
@@ -35,6 +37,12 @@ public class TheTrainCommand extends Command {
 	@Override
 	protected String execute(ChatManager chatManager, Room chatroom, Message message, String[] args) {
 		return Emojis.TRAIN_WAGGON;
+	}
+
+
+	@Override
+	public EventType<? extends MessageEvent> getInvocationType() {
+		return EventType.MESSAGE_POSTED;
 	}
 
 }

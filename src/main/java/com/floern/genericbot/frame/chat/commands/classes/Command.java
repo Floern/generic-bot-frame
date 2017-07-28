@@ -10,6 +10,8 @@ import java.util.Random;
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
 import fr.tunaki.stackoverflow.chat.User;
+import fr.tunaki.stackoverflow.chat.event.EventType;
+import fr.tunaki.stackoverflow.chat.event.MessageEvent;
 
 public abstract class Command implements CommandCategory {
 
@@ -18,13 +20,6 @@ public abstract class Command implements CommandCategory {
 		NORMAL,
 		REPLY,
 		NONE
-	}
-
-
-	public static class InvocationType {
-		public static final int MENTION = 1;
-		public static final int REPLY = 2;
-		public static final int MESSAGE = 4;
 	}
 
 
@@ -128,13 +123,11 @@ public abstract class Command implements CommandCategory {
 
 
 	/**
-	 * Get the invocation method of this command.
-	 * One or more combined of {@link InvocationType}. May be bitwise or'ed together.
-	 * @return One or multiple of {@link InvocationType}
+	 * Get the invocation method of this command, i.e. what type of message can trigger this command.
+	 * @return EventType, default USER_MENTIONED
 	 */
-	public int getInvocationType() {
-		// TODO: use tuna's MessageEvent types instead
-		return InvocationType.MENTION;
+	public EventType<? extends MessageEvent> getInvocationType() {
+		return EventType.USER_MENTIONED;
 	}
 
 

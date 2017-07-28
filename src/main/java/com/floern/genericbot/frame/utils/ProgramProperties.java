@@ -11,26 +11,12 @@ import java.util.Properties;
 public class ProgramProperties extends Properties {
 
 
-	private static String propertyFile;
-	private static ProgramProperties instance;
-
-
-	/**
-	 * Get the Properties instance.
-	 * @return
-	 */
-	public static synchronized ProgramProperties i() {
-		return instance;
-	}
-
-
 	/**
 	 * Load a new property file.
 	 * @param file
 	 */
-	public static synchronized void load(String file) {
-		propertyFile = file;
-		instance = new ProgramProperties();
+	public static synchronized ProgramProperties load(String file) {
+		ProgramProperties instance = new ProgramProperties();
 		try {
 			InputStream is = new FileInputStream(file);
 			instance.load(is);
@@ -39,14 +25,7 @@ public class ProgramProperties extends Properties {
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-
-	/**
-	 * Reload the property file.
-	 */
-	public static void reload() {
-		load(propertyFile);
+		return instance;
 	}
 
 

@@ -1,9 +1,9 @@
 package com.floern.genericbot.frame.chat.commands.classes;
 
-public interface UtilityCommandCategory extends CommandCategory {
+public interface MetaCommandCategory extends CommandCategory {
 
 	default String getCommandCategory() {
-		return "utility";
+		return "meta";
 	}
 
 }

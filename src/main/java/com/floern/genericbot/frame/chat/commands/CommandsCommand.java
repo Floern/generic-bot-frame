@@ -5,23 +5,21 @@ package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.commands.classes.CommandCategory;
+import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
 import com.floern.genericbot.frame.utils.StringUtil;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
 
-public class CommandsCommand extends Command {
-
-
-	private final List<Command> availableCommands;
-
-
-	public CommandsCommand(List<Command> availableCommands) {
-		this.availableCommands = availableCommands;
-	}
+public class CommandsCommand extends Command implements MetaCommandCategory {
 
 
 	@Override
@@ -41,22 +39,35 @@ public class CommandsCommand extends Command {
 		StringBuilder sb = new StringBuilder();
 
 		boolean showAll = args.length >= 2 && ("all".equals(args[1]) || "full".equals(args[1]));
+		final int labelWidth = showAll ? 30 : 16;
+		final int maxAliases = 4;
 
-		final String[] commandCategory = { "" };
-		availableCommands.stream().filter(command -> command.getUsageDescription() != null
-				&& (showAll || command.isCommanderPrivileged(chatManager, message.getUser())))
-				.forEach(command -> sb
-						.append(!commandCategory[0].equals(commandCategory[0] = command.getCommandCategory())
-								? ("    " + commandCategory[0] + "\n") : "")
-						.append("       ")
-						.append(StringUtil.padRight(showAll
-										 ? String.join("|", Arrays.asList(command.getAliases())
-												.subList(0, Math.min(4, command.getAliases().length)))
-										 : command.getAliases()[0],
-								showAll ? 30 : 16))
+		List<Command> commands = chatManager.getAllCommands().stream()
+				.filter(command -> command.getUsageDescription() != null
+					&& (showAll || command.isCommanderPrivileged(chatManager, message.getUser())))
+				.collect(Collectors.toList());
+
+		// create command groups
+		Map<String, List<Command>> commandGroups = new LinkedHashMap<>();
+		commands.stream().map(CommandCategory::getCommandCategory).distinct()
+				.forEach(category -> commandGroups.put(category, new LinkedList<>()));
+
+		// allot commands to their categories
+		commands.forEach(command -> commandGroups.get(command.getCommandCategory()).add(command));
+
+		// print commands
+		commandGroups.forEach((categoryName, commandsGroup) -> {
+			sb.append(categoryName).append("\n");
+			commandsGroup.forEach(command -> {
+				sb.append(StringUtil.padRight(showAll
+								? String.join("|", Arrays.asList(command.getAliases())
+									.subList(0, Math.min(maxAliases, command.getAliases().length)))
+								: command.getAliases()[0], labelWidth))
 						.append(" - ")
 						.append(command.getUsageDescription())
-						.append('\n'));
+						.append('\n');
+			});
+		});
 
 		return sb.toString();
 	}

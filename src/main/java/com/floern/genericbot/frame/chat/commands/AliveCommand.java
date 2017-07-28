@@ -5,11 +5,12 @@ package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
 
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
 
-public class AliveCommand extends Command {
+public class AliveCommand extends Command implements MetaCommandCategory {
 
 
 	@Override

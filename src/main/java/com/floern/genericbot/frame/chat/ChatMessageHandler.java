@@ -40,13 +40,13 @@ class ChatMessageHandler {
 
 	protected void process(MessagePostedEvent messageEvent) {
 		String messageContent = messageEvent.getMessage().getPlainContent();
-		process(messageEvent, messageContent, Command.InvocationType.MESSAGE);
+		process(messageEvent, messageContent);
 	}
 
 
 	protected void process(MessageReplyEvent messageEvent) {
 		String messageContent = messageEvent.getMessage().getPlainContent().replaceFirst("^:\\d+ ", "").trim();
-		process(messageEvent, messageContent, Command.InvocationType.REPLY);
+		process(messageEvent, messageContent);
 	}
 
 
@@ -57,15 +57,16 @@ class ChatMessageHandler {
 
 		messageContent = messageContent.replaceFirst("^@\\w+\\b", "").trim();
 
-		process(messageEvent, messageContent, Command.InvocationType.MENTION);
+		process(messageEvent, messageContent);
 	}
 
 
-	private void process(MessageEvent messageEvent, String messageContent, int invocationType) {
+	private void process(MessageEvent messageEvent, String messageContent) {
 		Message message = messageEvent.getMessage();
 
-		Command command = chatManager.getCommand(messageContent, invocationType);
+		Command command = chatManager.getCommand(messageContent, messageEvent);
 		if (command == null) {
+			// no command found
 			return;
 		}
 

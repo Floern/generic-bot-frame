@@ -5,6 +5,7 @@ package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
 import com.floern.genericbot.frame.utils.ProgramProperties;
 import com.floern.genericbot.frame.utils.StringUtil;
 import com.google.common.base.Strings;
@@ -19,11 +20,18 @@ import java.util.Map;
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
 
-public class StatusCommand extends Command {
+public class StatusCommand extends Command implements MetaCommandCategory {
 
 	private long startTime = System.currentTimeMillis();
 
+	private ProgramProperties programProperties;
+
 	private final Collection<StatusRecordCallback> statusRecordCallbacks = new HashSet<>();
+
+
+	public StatusCommand(ProgramProperties programProperties) {
+		this.programProperties = programProperties;
+	}
 
 
 	@Override
@@ -40,7 +48,7 @@ public class StatusCommand extends Command {
 
 	@Override
 	protected String execute(ChatManager chatManager, Room chatroom, Message message, String[] args) {
-		String location = ProgramProperties.i().getProperty("info.location");
+		String location = programProperties.getProperty("info.location");
 		if (Strings.isNullOrEmpty(location)) {
 			try {
 				location = InetAddress.getLocalHost().getHostName();
