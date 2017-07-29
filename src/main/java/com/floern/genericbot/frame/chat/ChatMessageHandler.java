@@ -25,8 +25,6 @@ class ChatMessageHandler {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ChatMessageHandler.class);
 
-	private final String selfPing;
-
 	private final ChatManager chatManager;
 
 	private final Map<Long, RateLimiter> perUserRateLimit = new HashMap<>();
@@ -34,7 +32,6 @@ class ChatMessageHandler {
 
 	protected ChatMessageHandler(ChatManager chatManager) {
 		this.chatManager = chatManager;
-		this.selfPing = ChatPrinter.pingForUser(chatManager.getProgramProperties().getProperty("chat.username", "$@#~"));
 	}
 
 
@@ -52,6 +49,9 @@ class ChatMessageHandler {
 
 	protected void process(UserMentionedEvent messageEvent) {
 		String messageContent = messageEvent.getMessage().getPlainContent().trim();
+
+		String ownName = messageEvent.getRoom().getUser(messageEvent.getTargetUserId()).getName();
+		String selfPing = ChatPrinter.pingForUser(ownName);
 		if (!selfPing.toLowerCase().startsWith(messageContent.split("\\s+")[0].toLowerCase()))
 			return;
 
@@ -99,7 +99,7 @@ class ChatMessageHandler {
 
 		User user = message.getUser().get();
 		long userId = user.getId();
-		if (!chatManager.getBotOwners().contains(userId)) {
+		if (!chatManager.getBotAdmins().contains(userId)) {
 			if (perUserRateLimit.containsKey(userId)) {
 				RateLimiter rateLimiter = perUserRateLimit.get(userId);
 				rateLimiter.addNewRequestNow();
@@ -112,7 +112,7 @@ class ChatMessageHandler {
 				}
 			}
 			else {
-				boolean userIsPriv = user.isRoomOwner() || user.isModerator();
+				boolean userIsPriv = user.isRoomOwner() || user.isModerator() || chatManager.getBotAdmins().contains(user.getId());
 				perUserRateLimit.put(userId, new RateLimiter(userIsPriv ? 10 : 4, 45, TimeUnit.SECONDS, true));
 			}
 		}

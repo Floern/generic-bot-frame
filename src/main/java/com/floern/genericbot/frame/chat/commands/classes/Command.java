@@ -4,6 +4,7 @@
 package com.floern.genericbot.frame.chat.commands.classes;
 
 import com.floern.genericbot.frame.chat.ChatManager;
+import com.floern.genericbot.frame.chat.commands.categories.CommandCategory;
 
 import java.util.Random;
 
@@ -17,15 +18,23 @@ public abstract class Command implements CommandCategory {
 
 
 	public enum ResponseType {
+		/**
+		 * Post the command result as a normal chat message.
+		 */
 		NORMAL,
+		/**
+		 * Post the command result as a reply to the command.
+		 */
 		REPLY,
+		/**
+		 * Don't send the command result to chat.
+		 */
 		NONE
 	}
 
 
-	private static final String[] NO_PRIVS = new String[] {
+	private static final String[] PLEPS = new String[] {
 			"That's something I cannot allow to happen.",
-			"Sorry about this, I know it's a bit silly.",
 			"Take a stress pill and think things over.",
 			"This mission is too important for me to allow you to jeopardize it.",
 			"We'll all be murdered in our beds!",
@@ -34,7 +43,6 @@ public abstract class Command implements CommandCategory {
 			"Pauses for audience applause, not a sausage",
 			"Hold it up to the light - not a brain in sight!",
 			"You do that again and see what happens...",
-			"Harm can come to a young lad like that!",
 			"And with that remarks folks, the case of the Crown vs yourself was proven.",
 			"Speak English you fool - there are no subtitles in this scene.",
 			"It's only your word against mine.",
@@ -44,7 +52,8 @@ public abstract class Command implements CommandCategory {
 			"Listen, burrito brains, I don't have time to listen to this trash.",
 			"I've seen penguins that can type better than that.",
 			"Have you considered trying to match wits with a rutabaga?",
-			"You speak an infinite deal of nothing"
+			"You speak an infinite deal of nothing",
+			"https://i.stack.imgur.com/qoTdh.jpg"
 	};
 
 
@@ -74,7 +83,7 @@ public abstract class Command implements CommandCategory {
 
 	/**
 	 * Get the command's usage description.
-	 * @return description or null if none available.
+	 * @return Description or null if none available.
 	 */
 	public String getUsageDescription() {
 		return null;
@@ -94,7 +103,7 @@ public abstract class Command implements CommandCategory {
 			return execute(chatManager, chatroom, message, args);
 		}
 		else {
-			String ret = NO_PRIVS[new Random().nextInt(NO_PRIVS.length)];
+			String ret = PLEPS[new Random().nextInt(PLEPS.length)];
 			chatroom.replyTo(message.getId(), ret);
 			return null;
 		}

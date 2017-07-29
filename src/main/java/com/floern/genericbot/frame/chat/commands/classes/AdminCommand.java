@@ -16,7 +16,7 @@ public abstract class AdminCommand extends PrivilegedCommand {
 	 */
 	@Override
 	public boolean isCommanderPrivileged(ChatManager chatManager, User user) {
-		return chatManager.getBotOwners().contains(user.getId());
+		return chatManager.getBotAdmins().contains(user.getId());
 	}
 
 }

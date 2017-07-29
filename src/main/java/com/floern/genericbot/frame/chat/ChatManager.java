@@ -10,11 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import fr.tunaki.stackoverflow.chat.ChatHost;
@@ -27,24 +29,25 @@ public class ChatManager {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ChatManager.class);
 
-	private final ProgramProperties programProperties;
+	private final Collection<Long> botAdmins;
 
-	private final List<Long> botOwners;
+	private StackExchangeClient client;
+	private ChatMessageHandler chatMessageHandler;
 
 	private Room devChatroom;
 	private Map<Integer, Room> chatrooms;
 
 	private List<Command> availableCommands = new LinkedList<>();
 
-	private CountDownLatch terminationCountdown;
+	private Consumer<Room> onConnectedCallback;
+
+	private CountDownLatch terminationSwitch;
 
 	private volatile boolean isRestarting;
 
 
 	public ChatManager(ProgramProperties programProperties) {
-		this.programProperties = programProperties;
-
-		this.botOwners = Arrays.stream(programProperties.getIntArray("chat.roomids"))
+		this.botAdmins = Arrays.stream(programProperties.getIntArray("bot.admins"))
 				.asLongStream().boxed().collect(Collectors.toList());
 	}
 
@@ -52,59 +55,65 @@ public class ChatManager {
 	/**
 	 * Start the chat manager, login to chat and wait for termination.
 	 * Blocks until it's terminated.
-	 * @param usermail
-	 * @param userpass
-	 * @param devroomid
-	 * @param roomids
-	 * @param chatConnectedCallback
+	 * @param usermail Bot account mail.
+	 * @param userpass Bot account password.
+	 * @param devroomid Developer room ID.
+	 * @param roomids All rooms to connect to.
+	 * @param onConnectedCallback
 	 */
-	public void start(String usermail, String userpass, int devroomid, int[] roomids, Runnable chatConnectedCallback) {
-		terminationCountdown = new CountDownLatch(1);
-
+	public void start(String usermail, String userpass, int devroomid, int[] roomids, Consumer<Room> onConnectedCallback) {
 		// conntect to chat
-		StackExchangeClient client = new StackExchangeClient(usermail, userpass);
-		ChatMessageHandler chatMessageHandler = new ChatMessageHandler(this);
+		this.client = new StackExchangeClient(usermail, userpass);
+		this.chatMessageHandler = new ChatMessageHandler(this);
+		this.chatrooms = new HashMap<>();
+		this.onConnectedCallback = onConnectedCallback;
 
 		// connect to dev room
-		LOGGER.info("connecting dev room...");
-		devChatroom = client.joinRoom(ChatHost.STACK_OVERFLOW, devroomid);
-		devChatroom.addEventListener(EventType.MESSAGE_POSTED, chatMessageHandler::process);
-		devChatroom.addEventListener(EventType.USER_MENTIONED, chatMessageHandler::process);
-		devChatroom.addEventListener(EventType.MESSAGE_REPLY, chatMessageHandler::process);
-		LOGGER.info("connected");
+		devChatroom = connectToRoom(ChatHost.STACK_OVERFLOW, devroomid);
 
 		// conntect to other chatrooms
-		chatrooms = new HashMap<>();
 		for (int roomid : roomids) {
 			if (roomid == devroomid)
 				continue;
-			LOGGER.info("connecting room " + roomid + "...");
-			Room chatroom = client.joinRoom(ChatHost.STACK_OVERFLOW, roomid);
-			chatroom.addEventListener(EventType.MESSAGE_POSTED, chatMessageHandler::process);
-			chatroom.addEventListener(EventType.USER_MENTIONED, chatMessageHandler::process);
-			chatroom.addEventListener(EventType.MESSAGE_REPLY, chatMessageHandler::process);
-			chatrooms.put(roomid, chatroom);
-			LOGGER.info("connected");
+			connectToRoom(ChatHost.STACK_OVERFLOW, roomid);
 		}
 
-		devChatroom.send("up and online!");
-
-		chatConnectedCallback.run();
+		terminationSwitch = new CountDownLatch(1);
 
 		try {
 			// wait for termination
-			terminationCountdown.await();
+			terminationSwitch.await();
+			// wait to allow any pending chat messages being sent
 			Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
-			LOGGER.debug("terminationCountdown interrupted", e);
+			LOGGER.warn("terminationSwitch interrupted", e);
 		}
 		finally {
 			client.close();
+			client = null;
 			chatrooms = null;
 			devChatroom = null;
 			LOGGER.info("disconnected");
 		}
+	}
+
+
+	/**
+	 * Connect to a chat room.
+	 * @param host Chat host.
+	 * @param roomid Chat room ID.
+	 */
+	public Room connectToRoom(ChatHost host, int roomid) {
+		LOGGER.info("connecting room " + roomid + "...");
+		Room chatroom = client.joinRoom(host, roomid);
+		chatroom.addEventListener(EventType.MESSAGE_POSTED, chatMessageHandler::process);
+		chatroom.addEventListener(EventType.USER_MENTIONED, chatMessageHandler::process);
+		chatroom.addEventListener(EventType.MESSAGE_REPLY, chatMessageHandler::process);
+		chatrooms.put(roomid, chatroom);
+		LOGGER.info("connected");
+		onConnectedCallback.accept(chatroom);
+		return chatroom;
 	}
 
 
@@ -181,12 +190,13 @@ public class ChatManager {
 	 * @return Command result.
 	 */
 	public CommandResult executeCommand(Command command, MessageEvent message, String messageContent) {
-		LOGGER.info("command: " + command);
+		LOGGER.info("command: " + command.getClass().getSimpleName());
 
 		String ret = command.invoke(this,
 				message == null ? null : message.getRoom(),
 				message == null ? null : message.getMessage(),
 				messageContent.split("\\s+"));
+
 		return new CommandResult(command.getResponseType(), ret);
 	}
 
@@ -195,8 +205,9 @@ public class ChatManager {
 	 * Trigger a restart, i.e. log off the chat and shutdown (and wait for someone to start a new instance again).
 	 */
 	public void restart() {
+		LOGGER.info("restarting...");
 		isRestarting = true;
-		terminationCountdown.countDown();
+		terminationSwitch.countDown();
 	}
 
 
@@ -205,8 +216,8 @@ public class ChatManager {
 	}
 
 
-	public List<Long> getBotOwners() {
-		return botOwners;
+	public Collection<Long> getBotAdmins() {
+		return botAdmins;
 	}
 
 
@@ -214,12 +225,8 @@ public class ChatManager {
 	 * Trigger termination.
 	 */
 	public void terminate() {
-		terminationCountdown.countDown();
-	}
-
-
-	public ProgramProperties getProgramProperties() {
-		return programProperties;
+		isRestarting = false;
+		terminationSwitch.countDown();
 	}
 
 

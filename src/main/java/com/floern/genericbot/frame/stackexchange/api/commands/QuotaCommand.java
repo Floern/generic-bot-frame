@@ -3,9 +3,9 @@
  */
 package com.floern.genericbot.frame.stackexchange.api.commands;
 
-import com.floern.stackoverflow.chat.ChatManager;
-import com.floern.stackoverflow.core.commands.classes.Command;
-import com.floern.stackoverflow.se_api.net.ApiLoader;
+import com.floern.genericbot.frame.chat.ChatManager;
+import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.stackexchange.api.net.ApiLoader;
 
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;

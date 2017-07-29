@@ -5,8 +5,8 @@ package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
-import com.floern.genericbot.frame.chat.commands.classes.CommandCategory;
-import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
+import com.floern.genericbot.frame.chat.commands.categories.CommandCategory;
+import com.floern.genericbot.frame.chat.commands.categories.MetaCommandCategory;
 import com.floern.genericbot.frame.utils.StringUtil;
 
 import java.util.Arrays;
@@ -41,6 +41,8 @@ public class CommandsCommand extends Command implements MetaCommandCategory {
 		boolean showAll = args.length >= 2 && ("all".equals(args[1]) || "full".equals(args[1]));
 		final int labelWidth = showAll ? 30 : 16;
 		final int maxAliases = 4;
+		final String codeIndentation = "    ";
+		final String itemIndentation = "   ";
 
 		List<Command> commands = chatManager.getAllCommands().stream()
 				.filter(command -> command.getUsageDescription() != null
@@ -57,9 +59,10 @@ public class CommandsCommand extends Command implements MetaCommandCategory {
 
 		// print commands
 		commandGroups.forEach((categoryName, commandsGroup) -> {
-			sb.append(categoryName).append("\n");
+			sb.append(codeIndentation).append(categoryName).append("\n");
 			commandsGroup.forEach(command -> {
-				sb.append(StringUtil.padRight(showAll
+				sb.append(codeIndentation).append(itemIndentation)
+						.append(StringUtil.padRight(showAll
 								? String.join("|", Arrays.asList(command.getAliases())
 									.subList(0, Math.min(maxAliases, command.getAliases().length)))
 								: command.getAliases()[0], labelWidth))

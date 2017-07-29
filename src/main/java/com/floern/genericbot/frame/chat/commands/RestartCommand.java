@@ -4,7 +4,7 @@
 package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
-import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
+import com.floern.genericbot.frame.chat.commands.categories.MetaCommandCategory;
 import com.floern.genericbot.frame.chat.commands.classes.PrivilegedCommand;
 
 import fr.tunaki.stackoverflow.chat.Message;
@@ -27,7 +27,7 @@ public class RestartCommand extends PrivilegedCommand implements MetaCommandCate
 
 	@Override
 	protected String execute(ChatManager chatManager, Room chatroom, Message message, String[] args) {
-		chatManager.getDevChatRoom().send("restarting...");
+		chatManager.getDevChatRoom().send("restarting…");
 		chatManager.restart();
 		return null;
 	}

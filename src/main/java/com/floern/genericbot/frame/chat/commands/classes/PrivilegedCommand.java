@@ -19,7 +19,7 @@ public abstract class PrivilegedCommand extends Command {
 	 */
 	@Override
 	public boolean isCommanderPrivileged(ChatManager chatManager, User user) {
-		return user.isRoomOwner() || user.isModerator() || chatManager.getBotOwners().contains(user.getId());
+		return user.isRoomOwner() || user.isModerator() || chatManager.getBotAdmins().contains(user.getId());
 	}
 
 }

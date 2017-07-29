@@ -1,4 +1,4 @@
-package com.floern.genericbot.frame.chat.commands.classes;
+package com.floern.genericbot.frame.chat.commands.categories;
 
 public interface CommandCategory {
 

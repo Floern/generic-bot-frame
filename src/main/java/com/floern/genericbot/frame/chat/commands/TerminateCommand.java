@@ -5,7 +5,7 @@ package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.AdminCommand;
-import com.floern.genericbot.frame.chat.commands.classes.MetaCommandCategory;
+import com.floern.genericbot.frame.chat.commands.categories.MetaCommandCategory;
 
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;

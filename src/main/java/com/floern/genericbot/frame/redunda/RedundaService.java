@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,7 @@ public class RedundaService {
 
 	private ScheduledExecutorService executorService;
 
-	private OnStandBystatusChangedListener standbyStatusChangedListener;
+	private OnStandbyStatusChangedListener standbyStatusChangedListener;
 
 	private int checkInterval = 30;
 	private TimeUnit checkIntervalUnit = TimeUnit.SECONDS;
@@ -42,7 +43,7 @@ public class RedundaService {
 	}
 
 
-	public RedundaService setStandbyStatusChangedListener(OnStandBystatusChangedListener standbyStatusChangedListener) {
+	public RedundaService setStandbyStatusChangedListener(OnStandbyStatusChangedListener standbyStatusChangedListener) {
 		this.standbyStatusChangedListener = standbyStatusChangedListener;
 		return this;
 	}
@@ -106,7 +107,34 @@ public class RedundaService {
 	}
 
 
-	public interface OnStandBystatusChangedListener {
+	public static RedundaService startAndWaitForGo(String apikey, OnStandbyStatusChangedListener standbyStatusChangedListener) {
+		CountDownLatch redundaHold = new CountDownLatch(1);
+		RedundaService redundaService = new RedundaService(apikey);
+		redundaService.setStandbyStatusChangedListener(standby -> {
+			standbyStatusChangedListener.onStandByStatusChanged(standby);
+			if (standby) {
+				LOGGER.info("STANDBY MODE ACTIVATED");
+			}
+			else {
+				LOGGER.info("STANDBY MODE DISABLED");
+				redundaHold.countDown();
+			}
+		});
+		redundaService.start();
+		try {
+			redundaHold.await();
+		}
+		catch (InterruptedException e) {
+			LOGGER.error("redunda hold await", e);
+			throw new RuntimeException(e);
+		}
+
+		return redundaService;
+	}
+
+
+
+	public interface OnStandbyStatusChangedListener {
 		void onStandByStatusChanged(boolean standby);
 	}
 
