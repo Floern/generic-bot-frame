@@ -1,2 +1,3 @@
-# generic-bot-frame
-Generic Bot framework for the Stack Exchange chat
+# Generic Bot Frame
+
+Generic Bot framework for the Stack Exchange chat written in Java.
