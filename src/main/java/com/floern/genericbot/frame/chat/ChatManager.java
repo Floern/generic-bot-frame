@@ -59,9 +59,11 @@ public class ChatManager {
 	 * @param userpass Bot account password.
 	 * @param devroomid Developer room ID.
 	 * @param roomids All rooms to connect to.
-	 * @param onConnectedCallback
+	 * @param onConnectedCallback Callback when connected to a room.
+	 * @param onAllConnectedCallback Callback when connected to all rooms.
 	 */
-	public void start(String usermail, String userpass, int devroomid, int[] roomids, Consumer<Room> onConnectedCallback) {
+	public void start(String usermail, String userpass, int devroomid, int[] roomids,
+			Consumer<Room> onConnectedCallback, Runnable onAllConnectedCallback) {
 		// conntect to chat
 		this.client = new StackExchangeClient(usermail, userpass);
 		this.chatMessageHandler = new ChatMessageHandler(this);
@@ -77,6 +79,8 @@ public class ChatManager {
 				continue;
 			connectToRoom(ChatHost.STACK_OVERFLOW, roomid);
 		}
+
+		onAllConnectedCallback.run();
 
 		terminationSwitch = new CountDownLatch(1);
 

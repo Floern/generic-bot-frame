@@ -11,8 +11,6 @@ import com.floern.genericbot.frame.utils.ProgramProperties;
 
 import org.junit.Test;
 
-import java.util.concurrent.CountDownLatch;
-
 import fr.tunaki.stackoverflow.chat.Room;
 
 public class GenericBotTest {
@@ -40,8 +38,6 @@ public class GenericBotTest {
 
 	private static class TestBot extends GenericBot {
 
-		private final CountDownLatch hold = new CountDownLatch(1);
-
 		public TestBot() {
 			super(ProgramProperties.load("data/bot.properties"));
 		}
@@ -49,15 +45,6 @@ public class GenericBotTest {
 		@Override
 		protected void onConnected(Room room) {
 			room.send("hello!");
-		}
-
-		@Override
-		protected void onShutdown() {
-			hold.countDown();
-		}
-
-		private void waitForTermination() throws InterruptedException {
-			hold.await();
 		}
 
 	}

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import fr.tunaki.stackoverflow.chat.Room;
 
@@ -33,6 +34,8 @@ public class GenericBot {
 
 	private List<Command> addedCommands = new ArrayList<>();
 
+	private final CountDownLatch terminationLatch = new CountDownLatch(1);
+
 
 	public GenericBot(ProgramProperties props) {
 		this.props = props;
@@ -42,6 +45,7 @@ public class GenericBot {
 	/**
 	 * Add a command to the bot.
 	 * @param command
+	 * @return This GeneriBot instance.
 	 */
 	public GenericBot registerCommand(Command command) {
 		if (chatManager != null) {
@@ -55,8 +59,9 @@ public class GenericBot {
 
 	/**
 	 * Start the bot.
+	 * @return This GeneriBot instance.
 	 */
-	public final void start() {
+	public final GenericBot start() {
 		if (chatManager != null) {
 			throw new IllegalStateException("GenericBot already running");
 		}
@@ -83,7 +88,8 @@ public class GenericBot {
 					props.getProperty(PROP_KEY_CHAT_USERPASS),
 					props.getInt(PROP_KEY_CHAT_DEVROOM),
 					props.getIntArray(PROP_KEY_CHAT_ROOMS),
-					GenericBot.this::onConnected);
+					GenericBot.this::onConnected,
+					GenericBot.this::onAllConnected);
 
 			if (redundaService != null) {
 				redundaService.stop();
@@ -98,7 +104,12 @@ public class GenericBot {
 			if (restart) {
 				start();
 			}
+			else {
+				terminationLatch.countDown();
+			}
 		}, "bot").start();
+
+		return this;
 	}
 
 
@@ -140,10 +151,27 @@ public class GenericBot {
 
 
 	/**
-	 * Callback on termination, after chat is disconnected.
+	 * Callback when the bot is connected to all chat rooms.
+	 */
+	protected void onAllConnected() {
+		// to be overridden
+	}
+
+
+	/**
+	 * Callback on termination or restart, after chat is disconnected.
 	 */
 	protected void onShutdown() {
 		// to be overridden
+	}
+
+
+	/**
+	 * Wait until the bot terminates.
+	 * @throws InterruptedException
+	 */
+	public void waitForTermination() throws InterruptedException {
+		terminationLatch.await();
 	}
 
 
