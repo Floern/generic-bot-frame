@@ -36,19 +36,19 @@ class ChatMessageHandler {
 
 
 	protected void process(MessagePostedEvent messageEvent) {
-		String messageContent = messageEvent.getMessage().getPlainContent();
+		String messageContent = messageEvent.getMessage().getContent();
 		process(messageEvent, messageContent);
 	}
 
 
 	protected void process(MessageReplyEvent messageEvent) {
-		String messageContent = messageEvent.getMessage().getPlainContent().replaceFirst("^:\\d+ ", "").trim();
+		String messageContent = messageEvent.getMessage().getContent().replaceFirst("^:\\d+ ", "").trim();
 		process(messageEvent, messageContent);
 	}
 
 
 	protected void process(UserMentionedEvent messageEvent) {
-		String messageContent = messageEvent.getMessage().getPlainContent().trim();
+		String messageContent = messageEvent.getMessage().getContent().trim();
 
 		String ownName = messageEvent.getRoom().getUser(messageEvent.getTargetUserId()).getName();
 		String selfPing = ChatPrinter.pingForUser(ownName);

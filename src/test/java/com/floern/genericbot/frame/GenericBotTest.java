@@ -18,8 +18,8 @@ public class GenericBotTest {
 
 	@Test
 	public void testBot() throws Exception {
-		TestBot bot = new TestBot();
-		bot.registerCommand(new AliveCommand())
+		new TestBot()
+				.registerCommand(new AliveCommand())
 				.registerCommand(new RestartCommand())
 				.registerCommand(new TerminateCommand())
 				.registerCommand(new CommandsCommand())
@@ -29,9 +29,8 @@ public class GenericBotTest {
 						.registerStatusRecordCallback(new StatusCommand.UptimeStatusRecordCallback())
 						.registerStatusRecordCallback(new StatusCommand.LocationStatusRecordCallback(ProgramProperties.load("data/bot.properties")))
 				)
-				.start();
-
-		bot.waitForTermination();
+				.start()
+				.waitForTermination();
 	}
 
 
