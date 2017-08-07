@@ -27,7 +27,7 @@ public class RestartCommand extends PrivilegedCommand implements MetaCommandCate
 
 	@Override
 	protected String execute(ChatManager chatManager, Room chatroom, Message message, String[] args) {
-		chatManager.getDevChatRoom().send("restarting…");
+		chatManager.getDevChatRoom().send("restarting\u2026");
 		chatManager.restart();
 		return null;
 	}
