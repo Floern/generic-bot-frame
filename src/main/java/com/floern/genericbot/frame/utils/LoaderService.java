@@ -3,10 +3,15 @@
  */
 package com.floern.genericbot.frame.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class LoaderService {
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(LoaderService.class);
 
 	protected static final long TIME_1_MINUTE = 60 * 1000L;
 	protected static final long TIME_2_MINUTES = 2 * 60 * 1000L;
@@ -18,24 +23,22 @@ public abstract class LoaderService {
 
 	private Timer timer;
 
-	private boolean started = false;
-	private boolean stopped = false;
 
-
-	public LoaderService() {
-		this.timer = new Timer();
-	}
-
-
-	public void start() {
-		if (started || stopped) {
-			throw new IllegalStateException();
+	public synchronized void start() {
+		if (timer != null) {
+			throw new IllegalStateException("LoaderService already started");
 		}
-		started = true;
 
+		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				executeRequest();
+				try {
+					executeRequest();
+				}
+				catch (Exception e) {
+					LOGGER.error("Unhandled Exception in TimerTask", e);
+					throw e;
+				}
 			}
 		}, 0, getTimeInterval());
 	}
@@ -47,11 +50,10 @@ public abstract class LoaderService {
 	protected abstract long getTimeInterval();
 
 
-	public void stop() {
-		if (!started || stopped) {
-			throw new IllegalStateException();
+	public synchronized void stop() {
+		if (timer == null) {
+			throw new IllegalStateException("LoaderService is not running");
 		}
-		stopped = true;
 
 		timer.cancel();
 		timer.purge();

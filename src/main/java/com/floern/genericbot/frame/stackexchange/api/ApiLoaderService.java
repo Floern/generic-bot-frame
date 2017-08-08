@@ -3,9 +3,9 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
+import com.floern.genericbot.frame.GenericBot;
 import com.floern.genericbot.frame.stackexchange.api.model.Container;
 import com.floern.genericbot.frame.stackexchange.api.net.ApiLoader;
-import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.utils.ChatPrinter;
 import com.floern.genericbot.frame.utils.LoaderService;
 
@@ -16,12 +16,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 abstract class ApiLoaderService<T extends Container> extends LoaderService {
 
-	private final ChatManager chatManager;
+	private final GenericBot genericBot;
 	private final Class<T> returnType;
 
 
-	public ApiLoaderService(ChatManager chatManager, Class<T> returnType) {
-		this.chatManager = chatManager;
+	public ApiLoaderService(GenericBot genericBot, Class<T> returnType) {
+		this.genericBot = genericBot;
 		this.returnType = returnType;
 	}
 
@@ -63,7 +63,7 @@ abstract class ApiLoaderService<T extends Container> extends LoaderService {
 
 
 	protected void onError(Exception e) {
-		chatManager.getDevChatRoom().send(ChatPrinter.formatException(e));
+		genericBot.getChatManager().getDevChatRoom().send(ChatPrinter.formatException(e));
 	}
 
 

@@ -3,7 +3,7 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
-import com.floern.genericbot.frame.chat.ChatManager;
+import com.floern.genericbot.frame.GenericBot;
 import com.floern.genericbot.frame.stackexchange.api.model.Answer;
 import com.floern.genericbot.frame.stackexchange.api.model.AnswersContainer;
 
@@ -21,8 +21,8 @@ public class AnswersLoaderService extends ApiLoaderService<AnswersContainer> {
 	private Set<OnAnswerLoadedListener> onAnswerLoadedListeners = new HashSet<>();
 
 
-	public AnswersLoaderService(ChatManager chatManager) {
-		super(chatManager, AnswersContainer.class);
+	public AnswersLoaderService(GenericBot genericBot) {
+		super(genericBot, AnswersContainer.class);
 		newestPostUnixTimestamp = (System.currentTimeMillis() - getTimeInterval()) / 1000;
 	}
 

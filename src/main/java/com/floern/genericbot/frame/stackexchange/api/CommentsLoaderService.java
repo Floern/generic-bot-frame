@@ -3,9 +3,9 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
+import com.floern.genericbot.frame.GenericBot;
 import com.floern.genericbot.frame.stackexchange.api.model.Comment;
 import com.floern.genericbot.frame.stackexchange.api.model.CommentsContainer;
-import com.floern.genericbot.frame.chat.ChatManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,8 +21,8 @@ public class CommentsLoaderService extends ApiLoaderService<CommentsContainer> {
 	private Set<OnCommentLoadedListener> onCommentLoadedListeners = new HashSet<>();
 
 
-	public CommentsLoaderService(ChatManager chatManager) {
-		super(chatManager, CommentsContainer.class);
+	public CommentsLoaderService(GenericBot genericBot) {
+		super(genericBot, CommentsContainer.class);
 		newestPostUnixTimestamp = (System.currentTimeMillis() - getTimeInterval()) / 1000;
 	}
 

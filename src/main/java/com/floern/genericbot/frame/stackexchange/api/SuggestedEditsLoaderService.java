@@ -3,7 +3,7 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
-import com.floern.genericbot.frame.chat.ChatManager;
+import com.floern.genericbot.frame.GenericBot;
 import com.floern.genericbot.frame.stackexchange.api.model.SuggestedEdit;
 import com.floern.genericbot.frame.stackexchange.api.model.SuggestedEditsContainer;
 
@@ -21,8 +21,8 @@ public class SuggestedEditsLoaderService extends ApiLoaderService<SuggestedEdits
 	private Set<OnSuggestedEditLoadedListener> onSuggestedEditLoadedListeners = new HashSet<>();
 
 
-	public SuggestedEditsLoaderService(ChatManager chatManager) {
-		super(chatManager, SuggestedEditsContainer.class);
+	public SuggestedEditsLoaderService(GenericBot genericBot) {
+		super(genericBot, SuggestedEditsContainer.class);
 		newestEditUnixTimestamp = (System.currentTimeMillis() - getTimeInterval()) / 1000;
 	}
 
