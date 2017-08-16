@@ -10,6 +10,11 @@ public class Comment {
 	private long post_id;
 	private String post_type;
 	private long comment_id;
+	private boolean can_flag;
+	private boolean edited;
+	private String body_markdown;
+	private String body;
+
 
 	public User getOwner() {
 		return owner;
@@ -29,6 +34,22 @@ public class Comment {
 
 	public String getPostType() {
 		return post_type;
+	}
+
+	public boolean canFlag() {
+		return can_flag;
+	}
+
+	public boolean isEdited() {
+		return edited;
+	}
+
+	public String getBodyMarkdown() {
+		return body_markdown;
+	}
+
+	public String getBody() {
+		return body;
 	}
 
 }

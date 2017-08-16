@@ -44,7 +44,7 @@ class Requests {
 			"&order=desc" +
 			"&sort=creation" +
 			"&pagesize=100&page=%d" +
-			"&filter=!)Q2B_A19OPq0i0*(EvnR4sw-";
+			"&filter=!SYCmunmA6S2HWAddSs";
 
 
 	protected static String answers(int page) {
