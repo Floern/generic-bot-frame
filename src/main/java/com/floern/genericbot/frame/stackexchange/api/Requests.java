@@ -3,7 +3,10 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
-class Requests {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Requests {
 
 
 	private static final String API_KEY = "Z85xnMThsPJ*TpmcWgCfkg((";
@@ -39,7 +42,7 @@ class Requests {
 
 
 	private static final String URL_COMMENTS = API_BASE_URL +
-			"comments?site=stackoverflow" +
+			"comments%s?site=stackoverflow" +
 			"&key=" + API_KEY +
 			"&order=desc" +
 			"&sort=creation" +
@@ -47,23 +50,29 @@ class Requests {
 			"&filter=!SYCmunmA6S2HWAddSs";
 
 
-	protected static String answers(int page) {
+	public static String answers(int page) {
 		return String.format(URL_ANSWERS, page);
 	}
 
 
-	protected static String questions(int page) {
+	public static String questions(int page) {
 		return String.format(URL_QUESTIONS, page);
 	}
 
 
-	protected static String suggestedEdits(int page) {
+	public static String suggestedEdits(int page) {
 		return String.format(URL_SUGGESTED_EDITS, page);
 	}
 
 
-	protected static String comments(int page) {
-		return String.format(URL_COMMENTS, page);
+	public static String comments(int page) {
+		return String.format(URL_COMMENTS, "", page);
+	}
+
+
+	public static String comments(List<Long> ids, int page) {
+		String idsParam = "/" + ids.stream().map(Object::toString).collect(Collectors.joining(";"));
+		return String.format(URL_COMMENTS, idsParam, page);
 	}
 
 }
