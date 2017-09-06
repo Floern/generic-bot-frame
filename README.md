@@ -29,10 +29,10 @@ dependencies {
 ```java
 public class Main {
 
-	public static void main(String[] rawrgs) throws InterruptedException {
-		new ExampleBot().start().waitForTermination();
-		System.exit(0);
-	}
+    public static void main(String[] rawrgs) throws InterruptedException {
+        new ExampleBot().start().waitForTermination();
+        System.exit(0);
+    }
 
 }
 ```
@@ -42,53 +42,53 @@ public class Main {
 ```java
 public class ExampleBot extends GenericBot {
 
-	// comments
-	private CommentsLoaderService commentsLoader;
+    // comments
+    private CommentsLoaderService commentsLoader;
 
-	public GenericBot() {
-		super(ProgramProperties.load("data/bot.properties"));
+    public GenericBot() {
+        super(ProgramProperties.load("data/bot.properties"));
 
-		StatusCommand statusCommand = new StatusCommand();
-		statusCommand
-				.registerStatusRecordCallback(new StatusCommand.UptimeStatusRecordCallback())
-				.registerStatusRecordCallback(new StatusCommand.LocationStatusRecordCallback(getProgramProperties()));
+        StatusCommand statusCommand = new StatusCommand();
+        statusCommand
+                .registerStatusRecordCallback(new StatusCommand.UptimeStatusRecordCallback())
+                .registerStatusRecordCallback(new StatusCommand.LocationStatusRecordCallback(getProgramProperties()));
 
-		registerCommand(new AliveCommand());
-		registerCommand(new CommandsCommand());
-		registerCommand(new TerminateCommand());
-		registerCommand(new TheTrainCommand());
-		registerCommand(statusCommand);
+        registerCommand(new AliveCommand());
+        registerCommand(new CommandsCommand());
+        registerCommand(new TerminateCommand());
+        registerCommand(new TheTrainCommand());
+        registerCommand(statusCommand);
 
-		// setup service to load new comments from Stack Overflow
-		commentsLoader = new CommentsLoaderService(this);
-		// provide API quota information to the status command
-		statusCommand.registerStatusRecordCallback(() ->
-				MapUtil.createSingle("api quota", ApiLoader.getQuotaRemaining() + " (max " + ApiLoader.getQuotaMax() + ")"));
+        // setup service to load new comments from Stack Overflow
+        commentsLoader = new CommentsLoaderService(this);
+        // provide API quota information to the status command
+        statusCommand.registerStatusRecordCallback(() ->
+                MapUtil.createSingle("api quota", ApiLoader.getQuotaRemaining() + " (max " + ApiLoader.getQuotaMax() + ")"));
 
-		// setup comment listener
-		commentsLoader.addOnCommentLoadedListener(new CommentsLoaderService.OnCommentLoadedListener() {
-			public void onCommentLoaded(Comment comment) {
-				getChatManager().getDevChatRoom()
-						.send("https://stackoverflow.com/posts/comments/" + comment.getCommentId());
-			}
-		});
-	}
+        // setup comment listener
+        commentsLoader.addOnCommentLoadedListener(new CommentsLoaderService.OnCommentLoadedListener() {
+            public void onCommentLoaded(Comment comment) {
+                getChatManager().getDevChatRoom()
+                        .send("https://stackoverflow.com/posts/comments/" + comment.getCommentId());
+            }
+        });
+    }
 
-	@Override
-	protected void onAllConnected() {
-		// send a message
-		getChatManager().getDevChatRoom().send("hello world!");
+    @Override
+    protected void onAllConnected() {
+        // send a message
+        getChatManager().getDevChatRoom().send("hello world!");
 
-		// start the comment service
-		ScheduledTaskExecutor.scheduleTask(commentsLoader::start, 0);
-	}
+        // start the comment service
+        ScheduledTaskExecutor.scheduleTask(commentsLoader::start, 0);
+    }
 
-	@Override
-	protected void onShutdown() {
-		// stop the comment service
-		commentsLoader.stop();
-		ScheduledTaskExecutor.cancelAll();
-	}
+    @Override
+    protected void onShutdown() {
+        // stop the comment service
+        commentsLoader.stop();
+        ScheduledTaskExecutor.cancelAll();
+    }
 
 }
 ```
