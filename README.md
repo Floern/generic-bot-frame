@@ -24,7 +24,31 @@ dependencies {
 
 ## Example Chat Bot
 
-### Main class
+### data/bot.properties
+
+Configuration file of the bot.
+
+```
+# bot account data
+chat.usermail = mybot@mail.com
+chat.userpass = correcthorsebatterystaple
+chat.username = My Bot
+# chat room ID for development
+chat.devroomid = 12345
+# other chat rooms to connect to (comma separated)
+chat.roomids = 12345
+# bot admins, user ID (comma separated)
+bot.admins = 123456
+# redunda support
+redunda.enabled = false
+redunda.apikey = myapikeyifenabled
+# bot's location (format: OwnerName/ComputerName)
+info.location = MyName/RaspberryPi
+```
+
+### Main.java
+
+The main class of the program.
 
 ```java
 public class Main {
@@ -37,12 +61,14 @@ public class Main {
 }
 ```
 
-### ExampleBot
+### ExampleBot.java
+
+A simple bot that loads new comments from Stack Overflow and posts them to chat if they match a pattern.
 
 ```java
 public class ExampleBot extends GenericBot {
 
-    // comments
+    // comment service
     private CommentsLoaderService commentsLoader;
 
     public GenericBot() {
@@ -92,3 +118,4 @@ public class ExampleBot extends GenericBot {
 
 }
 ```
+
