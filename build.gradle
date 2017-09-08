@@ -17,7 +17,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.floern'
             artifactId 'genericbot-frame'
-            version '0.9.8'
+            version '0.9.9'
 
             from components.java
 
