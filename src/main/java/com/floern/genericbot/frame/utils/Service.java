@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class LoaderService {
+public abstract class Service {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LoaderService.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(Service.class);
 
 	protected static final long TIME_1_MINUTE = 60 * 1000L;
 	protected static final long TIME_2_MINUTES = 2 * 60 * 1000L;
@@ -26,7 +26,7 @@ public abstract class LoaderService {
 
 	public synchronized void start() {
 		if (timer != null) {
-			throw new IllegalStateException("LoaderService already started");
+			throw new IllegalStateException("Service already started");
 		}
 
 		timer = new Timer();
@@ -52,7 +52,7 @@ public abstract class LoaderService {
 
 	public synchronized void stop() {
 		if (timer == null) {
-			throw new IllegalStateException("LoaderService is not running");
+			throw new IllegalStateException("Service is not running");
 		}
 
 		timer.cancel();

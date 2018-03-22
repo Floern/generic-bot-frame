@@ -51,6 +51,9 @@ public class ProgramProperties extends Properties {
 
 	public int[] getIntArray(String key) {
 		String raw = getProperty(key);
+		if (StringUtil.isEmpty(raw)) {
+			return new int[0];
+		}
 		String[] parts = raw.split("(?<!\\\\),");
 		int[] values = new int[parts.length];
 		for (int i = 0; i < values.length; ++i) {

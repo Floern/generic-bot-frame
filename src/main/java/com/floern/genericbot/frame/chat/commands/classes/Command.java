@@ -5,14 +5,13 @@ package com.floern.genericbot.frame.chat.commands.classes;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.categories.CommandCategory;
-
-import java.util.Random;
-
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.Room;
 import fr.tunaki.stackoverflow.chat.User;
 import fr.tunaki.stackoverflow.chat.event.EventType;
 import fr.tunaki.stackoverflow.chat.event.MessageEvent;
+
+import java.util.Random;
 
 public abstract class Command implements CommandCategory {
 
@@ -53,6 +52,7 @@ public abstract class Command implements CommandCategory {
 			"I've seen penguins that can type better than that.",
 			"Have you considered trying to match wits with a rutabaga?",
 			"You speak an infinite deal of nothing",
+			"This command is not available in your country.",
 			"https://i.stack.imgur.com/qoTdh.jpg"
 	};
 

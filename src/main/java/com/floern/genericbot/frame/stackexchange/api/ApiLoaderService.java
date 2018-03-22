@@ -7,14 +7,14 @@ import com.floern.genericbot.frame.GenericBot;
 import com.floern.genericbot.frame.stackexchange.api.model.Container;
 import com.floern.genericbot.frame.stackexchange.api.net.ApiLoader;
 import com.floern.genericbot.frame.utils.ChatPrinter;
-import com.floern.genericbot.frame.utils.LoaderService;
+import com.floern.genericbot.frame.utils.Service;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-abstract class ApiLoaderService<T extends Container> extends LoaderService {
+abstract class ApiLoaderService<T extends Container> extends Service {
 
 	private final GenericBot genericBot;
 	private final Class<T> returnType;

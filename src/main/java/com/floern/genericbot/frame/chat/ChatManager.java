@@ -5,25 +5,18 @@ package com.floern.genericbot.frame.chat;
 
 import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.ProgramProperties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import fr.tunaki.stackoverflow.chat.ChatHost;
 import fr.tunaki.stackoverflow.chat.Room;
 import fr.tunaki.stackoverflow.chat.StackExchangeClient;
 import fr.tunaki.stackoverflow.chat.event.EventType;
 import fr.tunaki.stackoverflow.chat.event.MessageEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ChatManager {
 
@@ -174,15 +167,12 @@ public class ChatManager {
 	 * Get the matching command for the input command string.
 	 * @param command input string
 	 * @param invocationType
-	 * @return command, or null if none found.
+	 * @return list of matching commands, or empty if none found.
 	 */
-	public Command getCommand(String command, MessageEvent invocationType) {
-		for (Command cmd : availableCommands) {
-			if (cmd.getInvocationType().equals(EventType.fromEvent(invocationType)) && cmd.is(command)) {
-				return cmd;
-			}
-		}
-		return null;
+	public List<Command> getCommands(String command, MessageEvent invocationType) {
+		return availableCommands.stream()
+				.filter(cmd -> cmd.getInvocationType().equals(EventType.fromEvent(invocationType)) && cmd.is(command))
+				.collect(Collectors.toList());
 	}
 
 

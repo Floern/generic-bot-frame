@@ -6,20 +6,19 @@ package com.floern.genericbot.frame.chat;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.ChatPrinter;
 import com.floern.genericbot.frame.utils.RateLimiter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import fr.tunaki.stackoverflow.chat.Message;
 import fr.tunaki.stackoverflow.chat.User;
 import fr.tunaki.stackoverflow.chat.event.MessageEvent;
 import fr.tunaki.stackoverflow.chat.event.MessagePostedEvent;
 import fr.tunaki.stackoverflow.chat.event.MessageReplyEvent;
 import fr.tunaki.stackoverflow.chat.event.UserMentionedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 class ChatMessageHandler {
 
@@ -64,8 +63,8 @@ class ChatMessageHandler {
 	private void process(MessageEvent messageEvent, String messageContent) {
 		Message message = messageEvent.getMessage();
 
-		Command command = chatManager.getCommand(messageContent, messageEvent);
-		if (command == null) {
+		List<Command> commands = chatManager.getCommands(messageContent, messageEvent);
+		if (commands.isEmpty()) {
 			// no command found
 			return;
 		}
@@ -74,19 +73,21 @@ class ChatMessageHandler {
 			return;
 		}
 
-		ChatManager.CommandResult ret = chatManager.executeCommand(command, messageEvent, messageContent);
+		for (Command command : commands) {
+			ChatManager.CommandResult ret = chatManager.executeCommand(command, messageEvent, messageContent);
 
-		if (ret != null && ret.getMessage() != null) {
-			switch (ret.getResponseType()) {
-				case NORMAL:
-					messageEvent.getRoom().send(ret.getMessage());
-					break;
-				case REPLY:
-					messageEvent.getRoom().replyTo(message.getId(), ret.getMessage());
-					break;
-				case NONE:
-					// nothing
-					break;
+			if (ret != null && ret.getMessage() != null) {
+				switch (ret.getResponseType()) {
+					case NORMAL:
+						messageEvent.getRoom().send(ret.getMessage());
+						break;
+					case REPLY:
+						messageEvent.getRoom().replyTo(message.getId(), ret.getMessage());
+						break;
+					case NONE:
+						// nothing
+						break;
+				}
 			}
 		}
 	}
