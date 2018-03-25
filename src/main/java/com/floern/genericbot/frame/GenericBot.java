@@ -11,6 +11,9 @@ import com.floern.genericbot.frame.utils.ProgramProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -102,11 +105,10 @@ public class GenericBot {
 			chatManager = null;
 
 			if (restart) {
-				start();
+				triggerRestart();
 			}
-			else {
-				terminationLatch.countDown();
-			}
+
+			terminationLatch.countDown();
 		}, "bot").start();
 
 		return this;
@@ -121,6 +123,23 @@ public class GenericBot {
 			throw new IllegalStateException("GenericBot not running");
 		}
 		chatManager.terminate();
+	}
+
+
+	/**
+	 * Terminate and restart the process.
+	 */
+	private void triggerRestart() {
+		try {
+			String jarFile = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			String cmd = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java " + jarFile;
+
+			Runtime.getRuntime().exec(cmd);
+		}
+		catch (IOException | URISyntaxException e) {
+			LOGGER.error("terminate and restart", e);
+			e.printStackTrace();
+		}
 	}
 
 

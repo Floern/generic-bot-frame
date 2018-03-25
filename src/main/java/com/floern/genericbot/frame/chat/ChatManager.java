@@ -5,18 +5,25 @@ package com.floern.genericbot.frame.chat;
 
 import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.ProgramProperties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import fr.tunaki.stackoverflow.chat.ChatHost;
 import fr.tunaki.stackoverflow.chat.Room;
 import fr.tunaki.stackoverflow.chat.StackExchangeClient;
 import fr.tunaki.stackoverflow.chat.event.EventType;
 import fr.tunaki.stackoverflow.chat.event.MessageEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class ChatManager {
 
@@ -186,12 +193,18 @@ public class ChatManager {
 	public CommandResult executeCommand(Command command, MessageEvent message, String messageContent) {
 		LOGGER.info("command: " + command.getClass().getSimpleName());
 
-		String ret = command.invoke(this,
-				message == null ? null : message.getRoom(),
-				message == null ? null : message.getMessage(),
-				messageContent.split("\\s+"));
+		try {
+			String ret = command.invoke(this,
+					message == null ? null : message.getRoom(),
+					message == null ? null : message.getMessage(),
+					messageContent.split("\\s+"));
 
-		return new CommandResult(command.getResponseType(), ret);
+			return new CommandResult(command.getResponseType(), ret);
+		}
+		catch (Exception e) {
+			LOGGER.error("command", e);
+			return null;
+		}
 	}
 
 

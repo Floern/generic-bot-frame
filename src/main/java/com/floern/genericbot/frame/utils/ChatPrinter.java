@@ -41,7 +41,8 @@ public class ChatPrinter {
 				prevPackagePrefix = INTERNAL_PACKAGE_PREFIXES.stream()
 						.filter(prefix -> stackTraceElement.getClassName().startsWith(prefix))
 						.findAny().orElse(stackTraceElement.getClassName());
-				sb.append(linePrefix).append(linePrefix).append(stackTraceElement.toString()).append('\n');
+				String element = stackTraceElement.toString().replaceAll("\\.([a-z_]{3})\\w{2,}(?=\\.)", "$1~");
+				sb.append(linePrefix).append(linePrefix).append(element).append('\n');
 			}
 			e = e.getCause();
 		}

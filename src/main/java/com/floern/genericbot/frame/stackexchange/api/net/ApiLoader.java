@@ -32,7 +32,7 @@ public class ApiLoader<T extends Container> extends GsonLoader<T> {
 
 
 	@Override
-	public ApiLoader onResult(OnResultCallback<T> onResultCallback) {
+	public ApiLoader<T> onResult(OnResultCallback<T> onResultCallback) {
 		super.onResult(response -> {
 			// adjust backoff if necessary
 			nextRequestEarliestTime = System.currentTimeMillis() + Math.max(1, Math.min(response.getBackoff() + 1, 120)) * 1000L;
@@ -56,7 +56,7 @@ public class ApiLoader<T extends Container> extends GsonLoader<T> {
 
 
 	@Override
-	public HttpLoader onError(OnErrorCallback onErrorCallback) {
+	public HttpLoader<T> onError(OnErrorCallback onErrorCallback) {
 		return super.onError(exception -> {
 			if (exception instanceof StatusCodeException) {
 				try {

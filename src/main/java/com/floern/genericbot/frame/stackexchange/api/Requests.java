@@ -3,6 +3,7 @@
  */
 package com.floern.genericbot.frame.stackexchange.api;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,15 @@ public class Requests {
 			"&order=desc" +
 			"&sort=activity" +
 			"&pagesize=50&page=%d" +
+			"&filter=!t.lNkcL6gE2D47B*VEmRNVYJrI4)NLe";
+
+
+	private static final String URL_ANSWERS_BY_IDS = API_BASE_URL +
+			"answers/%s?site=stackoverflow" +
+			"&key=" + API_KEY +
+			"&order=desc" +
+			"&sort=activity" +
+			"&pagesize=100" +
 			"&filter=!t.lNkcL6gE2D47B*VEmRNVYJrI4)NLe";
 
 
@@ -52,6 +62,17 @@ public class Requests {
 
 	public static String answers(int page) {
 		return String.format(URL_ANSWERS, page);
+	}
+
+
+	public static String answers(int... ids) {
+		String idsCsv = Arrays.stream(ids).mapToObj(Integer::toString).collect(Collectors.joining(","));
+		return String.format(URL_ANSWERS_BY_IDS, idsCsv);
+	}
+
+
+	public static String answer(int id) {
+		return answers(new int[]{ id });
 	}
 
 
