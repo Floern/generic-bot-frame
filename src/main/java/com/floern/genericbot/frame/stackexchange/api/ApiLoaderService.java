@@ -63,7 +63,7 @@ abstract class ApiLoaderService<T extends Container> extends Service {
 
 
 	protected void onError(Exception e) {
-		genericBot.getChatManager().getDevChatRoom().send(ChatPrinter.formatException(e));
+		genericBot.getChatManager().getDevChatRoom().send(ChatPrinter.formatExceptionCondensed(e));
 	}
 
 
