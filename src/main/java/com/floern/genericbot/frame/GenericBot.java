@@ -134,6 +134,7 @@ public class GenericBot {
 			String jarFile = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 			String cmd = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java " + jarFile;
 
+			LOGGER.info("restart: " + cmd);
 			Runtime.getRuntime().exec(cmd);
 		}
 		catch (IOException | URISyntaxException e) {

@@ -41,7 +41,7 @@ public class LetsEncryptSSLContextUtil {
 
 	private static KeyStore getKeyStore() throws Exception {
 		KeyStore ks = KeyStore.getInstance("JKS");
-		InputStream is = Class.class.getResourceAsStream("/certs/letsencrypt-truststore");
+		InputStream is = LetsEncryptSSLContextUtil.class.getResourceAsStream("/certs/letsencrypt-truststore");
 		try {
 			ks.load(is, "letsencrypt".toCharArray());
 		} finally {
