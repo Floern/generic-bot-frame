@@ -132,7 +132,7 @@ public class GenericBot {
 	private void triggerRestart() {
 		try {
 			String jarFile = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-			String cmd = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java " + jarFile;
+			String cmd = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java -jar " + jarFile;
 
 			LOGGER.info("restart: " + cmd);
 			Runtime.getRuntime().exec(cmd);
