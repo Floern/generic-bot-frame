@@ -33,6 +33,8 @@ public class RedundaService {
 
 	private Status lastKnownStatus;
 
+	private boolean failedOver = false;
+
 
 	/**
 	 * Create a Resunda service instance.
@@ -73,6 +75,12 @@ public class RedundaService {
 			new GsonLoader<>(request, Status.class)
 					.onResult(newStatus -> {
 						LOGGER.info(newStatus.getLocation() + " standby: " + Boolean.toString(newStatus.shouldStandby()));
+						if (newStatus.shouldStandby()) {
+							failedOver = false;
+						}
+						else if (!newStatus.shouldStandby() && lastKnownStatus != null && lastKnownStatus.shouldStandby()) {
+							failedOver = true;
+						}
 						if (standbyStatusChangedListener != null) {
 							if ((lastKnownStatus != null && lastKnownStatus.shouldStandby() != newStatus.shouldStandby())
 									|| (lastKnownStatus == null && !newStatus.shouldStandby())) {
@@ -90,13 +98,28 @@ public class RedundaService {
 	}
 
 
+	/**
+	 * Get the location that was set by Redunda for this instance.
+	 * @return
+	 */
 	public String getStatusLocation() {
 		return lastKnownStatus == null ? null : lastKnownStatus.getLocation();
 	}
 
 
+	/**
+	 * Whether we are on standby.
+	 */
 	public boolean getStatusStandby() {
 		return lastKnownStatus == null || lastKnownStatus.shouldStandby();
+	}
+
+
+	/**
+	 * Whether we're running after a failover signal.
+	 */
+	public boolean failedOver() {
+		return failedOver;
 	}
 
 
@@ -107,6 +130,12 @@ public class RedundaService {
 	}
 
 
+	/**
+	 * Start the Redunda service and block until we are not on standby.
+	 * @param apikey
+	 * @param standbyStatusChangedListener
+	 * @return
+	 */
 	public static RedundaService startAndWaitForGo(String apikey, OnStandbyStatusChangedListener standbyStatusChangedListener) {
 		CountDownLatch redundaHold = new CountDownLatch(1);
 		RedundaService redundaService = new RedundaService(apikey);

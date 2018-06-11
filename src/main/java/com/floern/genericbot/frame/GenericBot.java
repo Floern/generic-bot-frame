@@ -34,6 +34,7 @@ public class GenericBot {
 	private final ProgramProperties props;
 
 	private volatile ChatManager chatManager;
+	private RedundaService redundaService;
 
 	private List<Command> addedCommands = new ArrayList<>();
 
@@ -72,17 +73,17 @@ public class GenericBot {
 		chatManager = new ChatManager(props);
 		addedCommands.forEach(chatManager::addCommand);
 
+		// start bot core thread
 		new Thread(() -> {
 			// redunda management
 			final boolean redundaEnabled = props.getBoolean(PROP_KEY_REDUNDA_ENABLED, false);
-			RedundaService redundaService =
-					redundaEnabled ? RedundaService.startAndWaitForGo(props.getProperty(PROP_KEY_REDUNDA_APIKEY),
-							standby -> {
-								if (standby) {
-									onStandby();
-									chatManager.restart();
-								}
-							}) : null;
+			redundaService = redundaEnabled ? RedundaService.startAndWaitForGo(props.getProperty(PROP_KEY_REDUNDA_APIKEY),
+					standby -> {
+						if (standby) {
+							onStandby();
+							chatManager.restart();
+						}
+					}) : null;
 
 			onStart();
 
@@ -188,7 +189,6 @@ public class GenericBot {
 
 	/**
 	 * Wait until the bot terminates.
-	 * @throws InterruptedException
 	 */
 	public void waitForTermination() throws InterruptedException {
 		terminationLatch.await();
@@ -197,7 +197,6 @@ public class GenericBot {
 
 	/**
 	 * Get the chat manager instance.
-	 * @return
 	 */
 	public ChatManager getChatManager() {
 		return chatManager;
@@ -206,10 +205,17 @@ public class GenericBot {
 
 	/**
 	 * Get the bot's properties.
-	 * @return
 	 */
 	public ProgramProperties getProgramProperties() {
 		return props;
+	}
+
+
+	/**
+	 * Get the Redunda service instance.
+	 */
+	public RedundaService getRedundaService() {
+		return redundaService;
 	}
 
 

@@ -4,8 +4,8 @@
 package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
-import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.chat.commands.categories.MetaCommandCategory;
+import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.MapUtil;
 import com.floern.genericbot.frame.utils.ProgramProperties;
 import com.floern.genericbot.frame.utils.StringUtil;
@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -87,9 +88,25 @@ public class StatusCommand extends Command implements MetaCommandCategory {
 	 */
 	public static class UptimeStatusRecordCallback implements StatusRecordCallback {
 		private long startTime = System.currentTimeMillis();
+
 		@Override
 		public Map<String, String> getStatusLine() {
-			return MapUtil.createSingle("running since", new Date(startTime).toString());
+			long diff = System.currentTimeMillis() - startTime;
+
+			StringBuilder uptime =  new StringBuilder();
+			long secs = diff / 1000 % 60;
+			long mins = diff / (60 * 1000) % 60;
+			long hours = diff / (60 * 60 * 1000) % 24;
+			long days = diff / (24 * 60 * 60 * 1000);
+			if (days >= 1) uptime.append(days).append("d ");
+			if (hours >= 1 || days >= 1) uptime.append(hours).append("h ");
+			if (mins >= 1 || hours >= 1 || days >= 1) uptime.append(mins).append("m ");
+			if (secs >= 1 || mins >= 1 || hours >= 1 || days >= 1) uptime.append(secs).append("s");
+
+			Map<String, String> entries = new LinkedHashMap<>();
+			entries.put("uptime", uptime.toString());
+			entries.put("running since", new Date(startTime).toString());
+			return entries;
 		}
 	}
 
