@@ -11,7 +11,7 @@ import com.floern.genericbot.frame.utils.ProgramProperties;
 
 import org.junit.Test;
 
-import fr.tunaki.stackoverflow.chat.Room;
+import org.sobotics.chatexchange.chat.Room;
 
 public class GenericBotTest {
 

@@ -3,9 +3,6 @@ apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://raw.github.com/Tunaki/chatexchange/mvn-repo/'
-    }
 }
 
 task sourceJar(type: Jar) {
@@ -39,10 +36,10 @@ publishing {
 dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'org.apache.httpcomponents:httpclient:4.5.3'
-    compile 'org.jsoup:jsoup:1.9.1' // 1.10+ causes issues with tunalib
-    compile 'com.google.code.gson:gson:2.6.2' // also used in tunalib
+    compile 'org.jsoup:jsoup:1.9.1' // 1.10+ causes issues with chatexchange
+    compile 'com.google.code.gson:gson:2.6.2' // also used in chatexchange
     compile 'ch.qos.logback:logback-classic:1.2.1'
     compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'fr.tunaki.stackoverflow:chatexchange:1.1.1'
+    compile 'org.sobotics:chatexchange:2.0.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

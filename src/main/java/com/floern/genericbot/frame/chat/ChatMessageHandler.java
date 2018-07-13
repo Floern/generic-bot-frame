@@ -6,12 +6,12 @@ package com.floern.genericbot.frame.chat;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.ChatPrinter;
 import com.floern.genericbot.frame.utils.RateLimiter;
-import fr.tunaki.stackoverflow.chat.Message;
-import fr.tunaki.stackoverflow.chat.User;
-import fr.tunaki.stackoverflow.chat.event.MessageEvent;
-import fr.tunaki.stackoverflow.chat.event.MessagePostedEvent;
-import fr.tunaki.stackoverflow.chat.event.MessageReplyEvent;
-import fr.tunaki.stackoverflow.chat.event.UserMentionedEvent;
+import org.sobotics.chatexchange.chat.Message;
+import org.sobotics.chatexchange.chat.User;
+import org.sobotics.chatexchange.chat.event.MessageEvent;
+import org.sobotics.chatexchange.chat.event.MessagePostedEvent;
+import org.sobotics.chatexchange.chat.event.MessageReplyEvent;
+import org.sobotics.chatexchange.chat.event.UserMentionedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ package com.floern.genericbot.frame.chat.commands.classes;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 
-import fr.tunaki.stackoverflow.chat.User;
+import org.sobotics.chatexchange.chat.User;
 
 /**
  * A command that can only be executed by room owners or moderators.

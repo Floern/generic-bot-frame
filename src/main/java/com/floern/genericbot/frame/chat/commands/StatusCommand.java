@@ -11,16 +11,14 @@ import com.floern.genericbot.frame.utils.ProgramProperties;
 import com.floern.genericbot.frame.utils.StringUtil;
 import com.google.common.base.Strings;
 
+import org.sobotics.chatexchange.chat.Message;
+import org.sobotics.chatexchange.chat.Room;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import fr.tunaki.stackoverflow.chat.Message;
-import fr.tunaki.stackoverflow.chat.Room;
 
 public class StatusCommand extends Command implements MetaCommandCategory {
 
@@ -103,10 +101,7 @@ public class StatusCommand extends Command implements MetaCommandCategory {
 			if (mins >= 1 || hours >= 1 || days >= 1) uptime.append(mins).append("m ");
 			if (secs >= 1 || mins >= 1 || hours >= 1 || days >= 1) uptime.append(secs).append("s");
 
-			Map<String, String> entries = new LinkedHashMap<>();
-			entries.put("uptime", uptime.toString());
-			entries.put("running since", new Date(startTime).toString());
-			return entries;
+			return MapUtil.createSingle("uptime", uptime.toString());
 		}
 	}
 
