@@ -12,9 +12,6 @@ repositories {
     maven {
         url 'https://raw.githubusercontent.com/Floern/generic-bot-frame/repo/'
     }
-    maven {
-        url 'https://raw.githubusercontent.com/Tunaki/chatexchange/mvn-repo/'
-    }
 }
 
 dependencies {
