@@ -57,7 +57,7 @@ public class ProgramProperties extends Properties {
 		String[] parts = raw.split("(?<!\\\\),");
 		int[] values = new int[parts.length];
 		for (int i = 0; i < values.length; ++i) {
-			values[i] = Integer.parseInt(parts[i]);
+			values[i] = Integer.parseInt(parts[i].trim());
 		}
 		return values;
 	}
