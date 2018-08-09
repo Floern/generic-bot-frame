@@ -18,11 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 public class RedundaService {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(RedundaService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RedundaService.class);
 
 	private static final String REDUNDA_API_URL = "https://redunda.sobotics.org/status.json";
 
-	private String apikey;
+	private final String apikey;
+	private final String appVersion;
 
 	private ScheduledExecutorService executorService;
 
@@ -40,8 +41,9 @@ public class RedundaService {
 	 * Create a Resunda service instance.
 	 * @param apikey Redunda API key
 	 */
-	public RedundaService(String apikey) {
+	public RedundaService(String apikey, String appVersion) {
 		this.apikey = apikey;
+		this.appVersion = appVersion;
 	}
 
 
@@ -70,7 +72,7 @@ public class RedundaService {
 
 	private void execute() {
 		try {
-			HttpPost request = new HttpPostUrlEncoded(REDUNDA_API_URL, "key", apikey);
+			HttpPost request = new HttpPostUrlEncoded(REDUNDA_API_URL, "key", apikey, "version", appVersion);
 
 			new GsonLoader<>(request, Status.class)
 					.onResult(newStatus -> {
@@ -133,12 +135,14 @@ public class RedundaService {
 	/**
 	 * Start the Redunda service and block until we are not on standby.
 	 * @param apikey
+	 * @param appVersion
 	 * @param standbyStatusChangedListener
 	 * @return
 	 */
-	public static RedundaService startAndWaitForGo(String apikey, OnStandbyStatusChangedListener standbyStatusChangedListener) {
+	public static RedundaService startAndWaitForGo(String apikey, String appVersion,
+			OnStandbyStatusChangedListener standbyStatusChangedListener) {
 		CountDownLatch redundaHold = new CountDownLatch(1);
-		RedundaService redundaService = new RedundaService(apikey);
+		RedundaService redundaService = new RedundaService(apikey, appVersion);
 		redundaService.setStandbyStatusChangedListener(standby -> {
 			standbyStatusChangedListener.onStandByStatusChanged(standby);
 			if (standby) {

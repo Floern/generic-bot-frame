@@ -10,6 +10,7 @@ import com.floern.genericbot.frame.utils.ProgramProperties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sobotics.chatexchange.chat.Room;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +18,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
-import org.sobotics.chatexchange.chat.Room;
 
 public class GenericBot {
 
@@ -78,6 +77,7 @@ public class GenericBot {
 			// redunda management
 			final boolean redundaEnabled = props.getBoolean(PROP_KEY_REDUNDA_ENABLED, false);
 			redundaService = redundaEnabled ? RedundaService.startAndWaitForGo(props.getProperty(PROP_KEY_REDUNDA_APIKEY),
+					getAppVersion(),
 					standby -> {
 						if (standby) {
 							onStandby();
@@ -216,6 +216,14 @@ public class GenericBot {
 	 */
 	public RedundaService getRedundaService() {
 		return redundaService;
+	}
+
+
+	/**
+	 * Get the application version name. May be overridden, "unknown" by default.
+	 */
+	public String getAppVersion() {
+		return "unknown";
 	}
 
 
