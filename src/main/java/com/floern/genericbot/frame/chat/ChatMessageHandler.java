@@ -4,6 +4,7 @@
 package com.floern.genericbot.frame.chat;
 
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.model.ChatUser;
 import com.floern.genericbot.frame.utils.ChatPrinter;
 import com.floern.genericbot.frame.utils.RateLimiter;
 import org.sobotics.chatexchange.chat.Message;
@@ -26,7 +27,7 @@ class ChatMessageHandler {
 
 	private final ChatManager chatManager;
 
-	private final Map<Long, RateLimiter> perUserRateLimit = new HashMap<>();
+	private final Map<ChatUser, RateLimiter> perUserRateLimit = new HashMap<>();
 
 
 	protected ChatMessageHandler(ChatManager chatManager) {
@@ -100,9 +101,10 @@ class ChatMessageHandler {
 
 		User user = message.getUser().get();
 		long userId = user.getId();
-		if (!chatManager.getBotAdmins().contains(userId)) {
-			if (perUserRateLimit.containsKey(userId)) {
-				RateLimiter rateLimiter = perUserRateLimit.get(userId);
+		ChatUser userSpec = new ChatUser(userId, message.getRoom().getHost());
+		if (!chatManager.getBotAdmins().contains(userSpec)) {
+			if (perUserRateLimit.containsKey(userSpec)) {
+				RateLimiter rateLimiter = perUserRateLimit.get(userSpec);
 				rateLimiter.addNewRequestNow();
 				if (rateLimiter.isBlocked()) {
 					LOGGER.info("Request of user " + user.getName() + " has been dropped due to their rate limit");
@@ -113,8 +115,8 @@ class ChatMessageHandler {
 				}
 			}
 			else {
-				boolean userIsPriv = user.isRoomOwner() || user.isModerator() || chatManager.getBotAdmins().contains(user.getId());
-				perUserRateLimit.put(userId, new RateLimiter(userIsPriv ? 10 : 4, 45, TimeUnit.SECONDS, true));
+				boolean userIsPriv = user.isRoomOwner() || user.isModerator() || chatManager.getBotAdmins().contains(userSpec);
+				perUserRateLimit.put(userSpec, new RateLimiter(userIsPriv ? 10 : 4, 45, TimeUnit.SECONDS, true));
 			}
 		}
 

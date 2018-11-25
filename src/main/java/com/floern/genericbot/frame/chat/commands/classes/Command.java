@@ -5,6 +5,7 @@ package com.floern.genericbot.frame.chat.commands.classes;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.categories.CommandCategory;
+
 import org.sobotics.chatexchange.chat.Message;
 import org.sobotics.chatexchange.chat.Room;
 import org.sobotics.chatexchange.chat.User;
@@ -99,7 +100,7 @@ public abstract class Command implements CommandCategory {
 	 * @return
 	 */
 	public String invoke(ChatManager chatManager, Room chatroom, Message message, String[] args) {
-		if (message == null || isCommanderPrivileged(chatManager, message.getUser())) {
+		if (message == null || isCommanderPrivileged(chatManager, chatroom, message.getUser())) {
 			return execute(chatManager, chatroom, message, args);
 		}
 		else {
@@ -126,7 +127,7 @@ public abstract class Command implements CommandCategory {
 	 * @param user
 	 * @return
 	 */
-	public boolean isCommanderPrivileged(ChatManager chatManager, User user) {
+	public boolean isCommanderPrivileged(ChatManager chatManager, Room chatroom, User user) {
 		return true;
 	}
 

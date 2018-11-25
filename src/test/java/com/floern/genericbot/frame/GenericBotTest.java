@@ -27,7 +27,7 @@ public class GenericBotTest {
 				.registerCommand(new TheTrainCommand())
 				.registerCommand(new StatusCommand()
 						.registerStatusRecordCallback(new StatusCommand.UptimeStatusRecordCallback())
-						.registerStatusRecordCallback(new StatusCommand.LocationStatusRecordCallback(ProgramProperties.load("data/bot.properties")))
+						.registerStatusRecordCallback(new StatusCommand.LocationStatusRecordCallback(ProgramProperties.load("data/bot.instance.properties")))
 				)
 				.start()
 				.waitForTermination();
@@ -38,7 +38,7 @@ public class GenericBotTest {
 	private static class TestBot extends GenericBot {
 
 		public TestBot() {
-			super(ProgramProperties.load("data/bot.properties"));
+			super(ProgramProperties.load("data/bot.global.properties", "data/bot.instance.properties"));
 		}
 
 		@Override

@@ -13,17 +13,17 @@ public class ProgramProperties extends Properties {
 
 	/**
 	 * Load a new property file.
-	 * @param file
+	 * @param files list of property files
 	 */
-	public static synchronized ProgramProperties load(String file) {
+	public static synchronized ProgramProperties load(String... files) {
 		ProgramProperties instance = new ProgramProperties();
-		try {
-			InputStream is = new FileInputStream(file);
-			instance.load(is);
-			is.close();
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		for (String file : files) {
+			try (InputStream is = new FileInputStream(file)) {
+				instance.load(is);
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return instance;
 	}
@@ -62,5 +62,17 @@ public class ProgramProperties extends Properties {
 		return values;
 	}
 
+
+	public String[] getStringArray(String key) {
+		String raw = getProperty(key);
+		if (StringUtil.isEmpty(raw)) {
+			return new String[0];
+		}
+		String[] parts = raw.split("(?<!\\\\),");
+		for (int i = 0; i < parts.length; i++) {
+			parts[i] = parts[i].trim();
+		}
+		return parts;
+	}
 
 }

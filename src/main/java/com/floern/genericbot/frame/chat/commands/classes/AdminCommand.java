@@ -4,7 +4,9 @@
 package com.floern.genericbot.frame.chat.commands.classes;
 
 import com.floern.genericbot.frame.chat.ChatManager;
+import com.floern.genericbot.frame.chat.model.ChatUser;
 
+import org.sobotics.chatexchange.chat.Room;
 import org.sobotics.chatexchange.chat.User;
 
 public abstract class AdminCommand extends PrivilegedCommand {
@@ -15,8 +17,8 @@ public abstract class AdminCommand extends PrivilegedCommand {
 	 * @return
 	 */
 	@Override
-	public boolean isCommanderPrivileged(ChatManager chatManager, User user) {
-		return chatManager.getBotAdmins().contains(user.getId());
+	public boolean isCommanderPrivileged(ChatManager chatManager, Room room, User user) {
+		return chatManager.getBotAdmins().contains(new ChatUser(user.getId(), room.getHost()));
 	}
 
 }

@@ -5,6 +5,7 @@ package com.floern.genericbot.frame;
 
 import com.floern.genericbot.frame.chat.ChatManager;
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.model.ChatRoom;
 import com.floern.genericbot.frame.redunda.RedundaService;
 import com.floern.genericbot.frame.utils.ProgramProperties;
 
@@ -16,8 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 public class GenericBot {
 
@@ -87,13 +90,17 @@ public class GenericBot {
 
 			onStart();
 
+			ChatRoom devRoom = ChatRoom.parse(props.getProperty(PROP_KEY_CHAT_DEVROOM));
+			List<ChatRoom> allRooms = Arrays.stream(props.getStringArray(PROP_KEY_CHAT_ROOMS))
+					.map(ChatRoom::parse).collect(Collectors.toList());
+
 			// start chat loop (blocking)
 			chatManager.start(props.getProperty(PROP_KEY_CHAT_USERMAIL),
 					props.getProperty(PROP_KEY_CHAT_USERPASS),
-					props.getInt(PROP_KEY_CHAT_DEVROOM),
-					props.getIntArray(PROP_KEY_CHAT_ROOMS),
-					GenericBot.this::onConnected,
-					GenericBot.this::onAllConnected);
+					devRoom,
+					allRooms,
+					this::onConnected,
+					this::onAllConnected);
 
 			if (redundaService != null) {
 				redundaService.stop();

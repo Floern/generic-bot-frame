@@ -4,6 +4,8 @@
 package com.floern.genericbot.frame.chat;
 
 import com.floern.genericbot.frame.chat.commands.classes.Command;
+import com.floern.genericbot.frame.chat.model.ChatRoom;
+import com.floern.genericbot.frame.chat.model.ChatUser;
 import com.floern.genericbot.frame.utils.ProgramProperties;
 
 import org.slf4j.Logger;
@@ -28,13 +30,13 @@ public class ChatManager {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ChatManager.class);
 
-	private final Collection<Long> botAdmins;
+	private final Collection<ChatUser> botAdmins;
 
 	private StackExchangeClient client;
 	private ChatMessageHandler chatMessageHandler;
 
 	private Room devChatroom;
-	private Map<Integer, Room> chatrooms;
+	private Map<ChatRoom, Room> chatrooms;
 
 	private List<Command> availableCommands = new LinkedList<>();
 
@@ -46,8 +48,8 @@ public class ChatManager {
 
 
 	public ChatManager(ProgramProperties programProperties) {
-		this.botAdmins = Arrays.stream(programProperties.getIntArray("bot.admins"))
-				.asLongStream().boxed().collect(Collectors.toList());
+		this.botAdmins = Arrays.stream(programProperties.getStringArray("bot.admins"))
+				.map(ChatUser::parse).collect(Collectors.toSet());
 	}
 
 
@@ -56,12 +58,12 @@ public class ChatManager {
 	 * Blocks until it's terminated.
 	 * @param usermail Bot account mail.
 	 * @param userpass Bot account password.
-	 * @param devroomid Developer room ID.
-	 * @param roomids All rooms to connect to.
+	 * @param devroom Developer room.
+	 * @param rooms All rooms to connect to.
 	 * @param onConnectedCallback Callback when connected to a room.
 	 * @param onAllConnectedCallback Callback when connected to all rooms.
 	 */
-	public void start(String usermail, String userpass, int devroomid, int[] roomids,
+	public void start(String usermail, String userpass, ChatRoom devroom, List<ChatRoom> rooms,
 			Consumer<Room> onConnectedCallback, Runnable onAllConnectedCallback) {
 		// conntect to chat
 		this.client = new StackExchangeClient(usermail, userpass);
@@ -70,13 +72,13 @@ public class ChatManager {
 		this.onConnectedCallback = onConnectedCallback;
 
 		// connect to dev room
-		devChatroom = connectToRoom(ChatHost.STACK_OVERFLOW, devroomid);
+		devChatroom = connectToRoom(devroom);
 
 		// conntect to other chatrooms
-		for (int roomid : roomids) {
-			if (roomid == devroomid)
+		for (ChatRoom room : rooms) {
+			if (room.equals(devroom))
 				continue;
-			connectToRoom(ChatHost.STACK_OVERFLOW, roomid);
+			connectToRoom(room);
 		}
 
 		onAllConnectedCallback.run();
@@ -104,16 +106,15 @@ public class ChatManager {
 
 	/**
 	 * Connect to a chat room.
-	 * @param host Chat host.
-	 * @param roomid Chat room ID.
+	 * @param room Chat room.
 	 */
-	public Room connectToRoom(ChatHost host, int roomid) {
-		LOGGER.info("connecting room " + roomid + "...");
-		Room chatroom = client.joinRoom(host, roomid);
+	public Room connectToRoom(ChatRoom room) {
+		LOGGER.info("connecting room " + room.getRoomId() + " on " + room.getHost().getName() + "...");
+		Room chatroom = client.joinRoom(room.getHost(), room.getRoomId());
 		chatroom.addEventListener(EventType.MESSAGE_POSTED, chatMessageHandler::process);
 		chatroom.addEventListener(EventType.USER_MENTIONED, chatMessageHandler::process);
 		chatroom.addEventListener(EventType.MESSAGE_REPLY, chatMessageHandler::process);
-		chatrooms.put(roomid, chatroom);
+		chatrooms.put(room, chatroom);
 		LOGGER.info("connected");
 		onConnectedCallback.accept(chatroom);
 		return chatroom;
@@ -125,8 +126,18 @@ public class ChatManager {
 	 * @param roomId
 	 * @return
 	 */
-	public Room getChatRoom(int roomId) {
-		return chatrooms.getOrDefault(roomId, devChatroom);
+	public Room getChatRoom(ChatHost host, int roomId) {
+		return chatrooms.getOrDefault(new ChatRoom(roomId, host), devChatroom);
+	}
+
+
+	/**
+	 * Get the chatroom instance.
+	 * @param room
+	 * @return
+	 */
+	public Room getChatRoom(ChatRoom room) {
+		return chatrooms.getOrDefault(room, devChatroom);
 	}
 
 
@@ -222,7 +233,7 @@ public class ChatManager {
 	}
 
 
-	public Collection<Long> getBotAdmins() {
+	public Collection<ChatUser> getBotAdmins() {
 		return botAdmins;
 	}
 

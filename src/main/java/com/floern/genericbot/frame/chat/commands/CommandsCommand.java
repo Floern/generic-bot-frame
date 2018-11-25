@@ -4,10 +4,13 @@
 package com.floern.genericbot.frame.chat.commands;
 
 import com.floern.genericbot.frame.chat.ChatManager;
-import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.chat.commands.categories.CommandCategory;
 import com.floern.genericbot.frame.chat.commands.categories.MetaCommandCategory;
+import com.floern.genericbot.frame.chat.commands.classes.Command;
 import com.floern.genericbot.frame.utils.StringUtil;
+
+import org.sobotics.chatexchange.chat.Message;
+import org.sobotics.chatexchange.chat.Room;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -15,9 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.sobotics.chatexchange.chat.Message;
-import org.sobotics.chatexchange.chat.Room;
 
 public class CommandsCommand extends Command implements MetaCommandCategory {
 
@@ -46,7 +46,7 @@ public class CommandsCommand extends Command implements MetaCommandCategory {
 
 		List<Command> commands = chatManager.getAllCommands().stream()
 				.filter(command -> command.getUsageDescription() != null
-					&& (showAll || command.isCommanderPrivileged(chatManager, message.getUser())))
+					&& (showAll || command.isCommanderPrivileged(chatManager, chatroom, message.getUser())))
 				.collect(Collectors.toList());
 
 		// create command groups
