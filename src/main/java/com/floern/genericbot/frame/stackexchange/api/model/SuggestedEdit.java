@@ -5,7 +5,7 @@ public class SuggestedEdit {
     private User proposing_user;
     private long creation_date;
     private String post_type;
-    private int post_id;
+    private long post_id;
     private int suggested_edit_id;
     private String comment;
 
@@ -21,7 +21,7 @@ public class SuggestedEdit {
         return post_type;
     }
 
-    public int getPostId() {
+    public long getPostId() {
         return post_id;
     }
 

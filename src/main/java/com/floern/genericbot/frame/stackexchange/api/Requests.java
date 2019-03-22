@@ -14,6 +14,13 @@ public class Requests {
 
 	private static final String API_BASE_URL = "https://api.stackexchange.com/2.2/";
 
+	private static final String URL_POSTS = API_BASE_URL +
+			"posts?site=stackoverflow" +
+			"&key=" + API_KEY +
+			"&order=desc" +
+			"&sort=activity" +
+			"&pagesize=50&page=%d" +
+			"&filter=!4z6LufTWmlLUJj.hVFH6dGwkWUCuOxS66_JFk1";
 
 	private static final String URL_ANSWERS = API_BASE_URL +
 			"answers?site=stackoverflow" +
@@ -68,6 +75,11 @@ public class Requests {
 	public static String answers(int... ids) {
 		String idsCsv = Arrays.stream(ids).mapToObj(Integer::toString).collect(Collectors.joining(","));
 		return String.format(URL_ANSWERS_BY_IDS, idsCsv);
+	}
+
+
+	public static String posts(int page) {
+		return String.format(URL_POSTS, page);
 	}
 
 

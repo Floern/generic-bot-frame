@@ -5,15 +5,10 @@ package com.floern.genericbot.frame.stackexchange.api.model;
 
 public class Answer extends Post {
 
-	private int answer_id;
+	private long answer_id;
 
-	public int getAnswerId() {
+	public long getAnswerId() {
 		return answer_id;
-	}
-
-	@Override
-	public int getPostId() {
-		return getAnswerId();
 	}
 
 }

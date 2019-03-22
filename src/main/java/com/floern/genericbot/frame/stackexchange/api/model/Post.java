@@ -3,8 +3,13 @@
  */
 package com.floern.genericbot.frame.stackexchange.api.model;
 
-public abstract class Post {
+public class Post {
 
+	public static final String TYPE_QUESTION = "question";
+	public static final String TYPE_ANSWER = "answer";
+
+	private long post_id;
+	private String post_type;
 	private User owner;
 	private int score;
 	private long creation_date;
@@ -12,6 +17,14 @@ public abstract class Post {
 	private User last_editor;
 	private long last_edit_date;
 	private String body;
+
+	public long getPostId() {
+		return post_id;
+	}
+
+	public String getPostType() {
+		return post_type;
+	}
 
 	public User getOwner() {
 		return owner;
@@ -40,7 +53,5 @@ public abstract class Post {
 	public String getBody() {
 		return body;
 	}
-
-	public abstract int getPostId();
 
 }
