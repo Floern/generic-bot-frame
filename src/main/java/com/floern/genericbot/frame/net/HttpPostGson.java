@@ -16,6 +16,7 @@ public class HttpPostGson extends HttpPost {
 		String json = new Gson().toJson(data);
 		StringEntity dataEntity = new StringEntity(json, ContentType.APPLICATION_JSON);
 		setEntity(dataEntity);
+		setHeader("Content-Type", "application/json");
 	}
 
 }
